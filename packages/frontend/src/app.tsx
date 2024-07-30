@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'preact/hooks'
 import { JSX } from 'preact';
+import { Link, Route } from "wouter-preact"
 
 interface ColumnInfo {
   columnName: string;
@@ -42,43 +43,51 @@ export function App() {
     selectRow ? getColumns() : null
   }, [selectRow])
 
-  function onchangeoption(event: JSX.TargetedEvent<HTMLSelectElement, Event>) {
-    event.currentTarget.value !== "default" ? setSelectRow(event.currentTarget.value) : null
-  }
-
   return (
     <>
-      <select onChange={event => onchangeoption(event)}>
-        <option value="default">Some option</option>
-        {tables?.map(data => (
-          <option key={data.INTERNAL_UUID} value={data.columnName}>{data.columnName}</option>
-        ))}
-      </select>
+      <div className="layout-container">
+        <aside>
+          <nav>
+            <ul>
+              <li><h2>Tables</h2></li>
+              {tables?.map(data => (
+                <li key={data.INTERNAL_UUID}>
+                  <button onClick={() => setSelectRow(data.columnName)}>
+                    {data.columnName}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
 
-      <div className="container">
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                {d?.key.map(data => (
-                  <th key={data.columnName}>{data.columnName} ({data.dataType})</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {d?.key.map(e => (
-                  <td key={e.INTERNAL_UUID}>
-                    {d.values.map(data => (
-                      <p key={data.INTERNAL_UUID}>{data.tableValue[e.columnName]}</p>
-                    ))}
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
+        <div className="container">
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  {d?.key.map(data => (
+                    <th key={data.columnName}>{data.columnName} ({data.dataType})</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {d?.key.map(e => (
+                    <td key={e.INTERNAL_UUID}>
+                      {d.values.map(data => (
+                        <p key={data.INTERNAL_UUID}>{data.tableValue[e.columnName]}</p>
+                      ))}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+
     </>
   )
 }
