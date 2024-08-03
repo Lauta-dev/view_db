@@ -1,27 +1,14 @@
 import { useState, useEffect } from 'preact/hooks'
-import { JSX } from 'preact';
-import { Link, Route } from "wouter-preact"
-
-interface ColumnInfo {
-  columnName: string;
-  dataType: string;
-  INTERNAL_UUID: string;
-}
 
 interface ColumnName {
   columnName: string
   INTERNAL_UUID: string;
 }
 
-interface A {
-  key: ColumnInfo[]
-  values: object[]
-}
-
 export function App() {
   const [tables, setTables] = useState<ColumnName[]>()
   const [selectRow, setSelectRow] = useState<string>()
-  const [d, setD] = useState<A>()
+  const [m, setM] = useState<[]>()
 
   useEffect(() => {
     async function getTables() {
@@ -34,14 +21,16 @@ export function App() {
 
   useEffect(() => {
     async function getColumns() {
-      const f = await fetch(`http://localhost:3000/columns?column=${selectRow}`)
+      console.log(selectRow)
+      const f = await fetch(`http://localhost:3000/pap?table=${selectRow}`)
       const json = await f.json()
-      const tableInfo: ColumnInfo[] = json.info
-      setD({ values: json.value, key: tableInfo })
+      console.log(json)
+      setM(json)
     }
 
     selectRow ? getColumns() : null
   }, [selectRow])
+
 
   return (
     <>
@@ -66,18 +55,38 @@ export function App() {
             <table>
               <thead>
                 <tr>
-                  {d?.key.map(data => (
-                    <th key={data.columnName}>{data.columnName} ({data.dataType})</th>
+                  {m?.columns.map(data => (
+                    <th key={data.columnName}> {data.columnName} ({data.dataType})</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  {d?.key.map(e => (
+                  {m?.columns.map(e => (
                     <td key={e.INTERNAL_UUID}>
-                      {d.values.map(data => (
-                        <p key={data.INTERNAL_UUID}>{data.tableValue[e.columnName]}</p>
-                      ))}
+                      {m?.registers.map(data => {
+                        if (e.dataType === "date" || e.dataType === "timestamp with time zone") {
+                          const date = new Date(data[e.columnName]);
+                          const options = {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            second: 'numeric',
+                            timeZoneName: 'short'
+                          };
+
+                          const formatter = new Intl.DateTimeFormat('en-US', options);
+                          const formattedDate = formatter.format(date);
+
+                          data[e.columnName] = formattedDate
+                        }
+                        if (!data[e.columnName]) data[e.columnName] = "-"
+                        return <p key={data.INTERNAL_UUID}>{data[e.columnName]}</p>
+                      }
+
+                      )}
                     </td>
                   ))}
                 </tr>

@@ -1,4 +1,4 @@
-export interface GetColumns {
-  INTERNAL_UUID: string
+export  interface a {
   columnName: string
+  dataType: string
 }

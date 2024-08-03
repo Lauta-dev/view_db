@@ -1,27 +1,28 @@
-import { Inject, Module, OnModuleDestroy } from '@nestjs/common';
-import { ClientConfig, Pool } from 'pg';
+import { Module } from '@nestjs/common';
+import * as pgPromise from 'pg-promise';
+
 export const PG_CONNECTION = "PG_CONNECTION"
 
-const opts: ClientConfig = {
+const pgp = pgPromise()
+
+const opts = {
   port: 5432,
   password: "example",
-  host: "172.18.0.2",
+  host: "172.20.0.2",
   database: "lauta",
-  user: "postgres",
+  user: "lauta",
 }
+
+const db = pgp(opts)
 
 const dbProvider = {
   provide: PG_CONNECTION,
-  useValue: new Pool(opts)
+  useValue: db
 }
 
 @Module({
   providers: [dbProvider], exports: [dbProvider]
 })
-export class DbModule implements OnModuleDestroy {
-  constructor(@Inject(PG_CONNECTION) private conn: Pool) { }
-
-  async onModuleDestroy() {
-    await this.conn.end();
-  }
+export class DbModule {
+ 
 }
