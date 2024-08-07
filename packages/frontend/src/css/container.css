@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  height: calc(100vh - 1rem);
+}
+
+.t-container {
+  width: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}

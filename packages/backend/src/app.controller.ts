@@ -1,17 +1,19 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Get()
-  async sayHi() {
+  async getColumns() {
     return this.appService.getColumns()
   }
 
-  @Get("pap")
-  async b(@Query('table') table: string) {
-    return this.appService.getRows(table)
+  @Get("t")
+  async getRows(@Res() res: Response, @Query('table') tableName: string) {
+    const response = await this.appService.getRows(tableName)
+    return res.status(response.server.statusCode).send(response)
   }
 }

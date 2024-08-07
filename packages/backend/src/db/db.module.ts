@@ -1,28 +1,24 @@
-import { Module } from '@nestjs/common';
+import { Module, DynamicModule } from '@nestjs/common';
 import * as pgPromise from 'pg-promise';
+import { Db } from './db';
+import { connection } from 'src/CONSTANTE';
+import { IConnectionParameters } from 'pg-promise/typescript/pg-subset';
+const pgp = pgPromise();
 
-export const PG_CONNECTION = "PG_CONNECTION"
-
-const pgp = pgPromise()
-
-const opts = {
-  port: 5432,
-  password: "example",
-  host: "172.20.0.2",
-  database: "lauta",
-  user: "lauta",
-}
-
-const db = pgp(opts)
-
-const dbProvider = {
-  provide: PG_CONNECTION,
-  useValue: db
-}
-
-@Module({
-  providers: [dbProvider], exports: [dbProvider]
-})
+Module({})
 export class DbModule {
- 
+  static forRoot(dbConfig: IConnectionParameters): DynamicModule {
+    const dbProvider = {
+      provide: connection,
+      useFactory: () => {
+        return pgp(dbConfig)
+      }
+    }
+
+    return {
+      module: DbModule,
+      providers: [dbProvider, Db],
+      exports: [Db]
+    }
+  }
 }

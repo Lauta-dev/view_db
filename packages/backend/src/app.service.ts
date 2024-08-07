@@ -1,63 +1,47 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PG_CONNECTION } from './db/db.module';
-import pg from 'pg-promise/typescript/pg-subset';
-import pgPromise from 'pg-promise';
-import { a } from './interface/getColumns';
-import { register } from 'module';
-
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { Db } from './db/db';
+import { ReturnResponse } from './returnResponse';
 
 @Injectable()
 export class AppService {
-  constructor(@Inject(PG_CONNECTION) private conn: pgPromise.IDatabase<{}, pg.IClient>) { }
+  constructor(private readonly db: Db) { }
 
   async getColumns() {
-    const sql = `SELECT table_name AS "columnName" FROM information_schema.tables WHERE table_schema = 'public';`
-    const res = await this.conn.query(sql)
-    const addId = res.map(data => (
-      {
-        ...data,
-        INTERNAL_UUID: crypto.randomUUID()
-      }
-    ))
-
-    return addId
+    const getColumns = await this.db.getColumns()
+    return getColumns
   }
 
-  async getRows(table: string) {
-    // TODO: Obtener: nombre y tipo de la columna, los registros
+  async getRows(tableName: string) {
+    const tableData = await this.db.getRows(tableName)
 
-    // Esto me devuelve los data type de cada columna pero desordenado
-    const sql = 'select column_name AS "columnName", data_type AS "dataType" from information_schema.columns where table_name = $1;'
-    let columns: a[] = (await this.conn.any(sql, table)).reverse()
-    const registers: Array<{}> = await this.conn.query('SELECT * FROM ${table:name} LIMIT 3;', { table });
-    const keys = {
-      registersKeys: Object.keys(registers[0])
-    }
+    if (typeof tableData === "boolean")
+      return new ReturnResponse(HttpStatus.NOT_FOUND, `Table not found`, { tableName }).getResponse()
 
-    let a: { k: string[] } = {
-      k: [],
-    }
+    const { registers, columns } = tableData
 
-    // NOTE: idea
-    // Hacer un Objeect.ket() para obtener los ket de los objetos
-    // y comparar estos valores
-
-    // NOTE:
-    //  - Se me ocurrio usar esta sintaxis para "machear" 
+    const tableInfo = []
+    const registersKeys = Object.keys(registers[0])
 
     // WARNING: NO TOQUES ESTO, O SOS CDT
-    columns.forEach(e => {
-      registers.forEach(d => {
-        if (d[e.columnName]) {
-          a.k.push(d[e.columnName])
+    columns.forEach(column => {
+      registersKeys.forEach(data => {
+        if (data === column.columnName) {
+          tableInfo.push({
+            UUID: crypto.randomUUID(),
+            columnName: data,
+            dataType: column.dataType
+          })
         }
       })
-    } )
+    })
 
-    return {
-      a,
-      columns,
+    const tableWithId = registers.map(record => ({ values: { ...record }, UUID: crypto.randomUUID() }))
+
+    return new ReturnResponse(HttpStatus.OK, "", {
+      tableInfo,
+      tableWithId,
+      registersKeys,
       registers
-    }
+    }).getResponse()
   }
 }

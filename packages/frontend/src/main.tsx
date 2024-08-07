@@ -1,5 +1,6 @@
 import { render } from 'preact'
 import { App } from './app.tsx'
-import "./table.css"
+import "./normalize.css"
+import "./global.css"
 
 render(<App />, document.getElementById('app')!)
