@@ -18,6 +18,14 @@ export class Db {
     return result.exists
   }
 
+  private async checkIfEmplyTable(tableName: string): Promise<boolean> {
+    const result: { count: string }[] = await this.db.query(SQLQuerys.checkTableEmpty, { table: tableName })
+    const { count } = result[0]
+    const countToNumber = Number(count)
+
+    return Boolean(countToNumber);
+  }
+
   public async getColumns() {
     const tablesNames: Pick<TableColumns, "columnName">[] = await this.db.query(SQLQuerys.getTableNames)
     return tablesNames.map(data => ({ ...data, INTERNAL_UUID: crypto.randomUUID() }))
@@ -25,7 +33,15 @@ export class Db {
 
   async getRows(table: string): Promise<boolean | { columns: any[]; registers: any; }> {
     const check = await this.checkIfTableExist(table)
-    if (!check) return check
+    const checkTableEmply = await this.checkIfEmplyTable(table)
+
+    if (!check) {
+      return check
+    }
+
+    if (!checkTableEmply) {
+      return checkTableEmply
+    }
 
     const tableColumns: TableColumns[] = (await this.db.any(SQLQuerys.getTableColumn, table)).reverse()
     const registers: Object[] = await this.db.query(SQLQuerys.getColumns, { table });
