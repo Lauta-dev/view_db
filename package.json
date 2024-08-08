@@ -6,7 +6,8 @@
   "author": "",
   "license": "ISC",
     "scripts": {
-    "back": "pnpm --filter backend run start:dev",
-    "front": "pnpm --filter frontend run dev"
+    "dev": "pnpm -r --filter='./packages/*' run dev",
+    "build": "pnpm -r --filter='./packages/*' run build",
+    "dev:back": "pnpm --filter='back' run build"
   }
 }
