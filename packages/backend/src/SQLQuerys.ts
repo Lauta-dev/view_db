@@ -16,5 +16,7 @@ export const SQLQuerys = {
     FROM information_schema.columns
     WHERE table_name = $1;`,
 
-  getColumns: 'SELECT * FROM ${table:name} LIMIT 50;'
+  getColumns: 'SELECT * FROM ${table:name} LIMIT 50;',
+  
+  checkTableEmpty: "SELECT count(*) FROM (SELECT 1 FROM ${table:name} LIMIT 1) AS t"
 }
