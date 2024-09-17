@@ -39,7 +39,7 @@ export default function App() {
   useEffect(() => {
     async function execQuery() {
       setErrorInFetch(false)
-      const replaceSpace = sqlQuery?.split(" ").join("%20")
+      const replaceSpace = encodeURIComponent(sqlQuery ?? "")
 
       try {
         const fetchData = await fetch(`/api/exec?query=${replaceSpace}`)
@@ -53,7 +53,7 @@ export default function App() {
       }
     }
 
-    sqlQuery !== undefined 
+    sqlQuery !== undefined
       ? execQuery()
       : null
 
