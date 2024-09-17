@@ -1,0 +1,42 @@
+name: Build and Push Docker Image to Docker Hub
+
+on:
+  push:
+    branches:
+      - main  # Cambia 'main' por la rama que prefieras
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Update lockfile
+      run: pnpm install --lockfile-only
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Compile project
+      run: pnpm run build  # Ajusta este comando según el script que uses para compilar en tu package.json
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/view_db:latest  # Cambia 'my-image' por el nombre de tu imagen
+
+    - name: Log out from Docker Hub
+      run: docker logout

@@ -1,0 +1,26 @@
+{
+  "name": "view_db",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "dev": "pnpm -r --filter='./packages/*' run dev",
+    "build": "pnpm -r --filter='./packages/*' run build",
+    "format": "pnpm -r --filter='./packages/*' run format",
+    "lint": "pnpm -r --filter='./packages/*' run lint",
+    
+    "dev:back": "pnpm --filter='./packages/server/' run dev",
+    "dev:front": "pnpm --filter='./packages/client/' run dev",
+    
+    "build:server": "pnpm --filter='./packages/server/' run build",
+    "build:client": "pnpm --filter='./packages/client/' run build",
+
+    "format:server": "pnpm --filter='./packages/server/' run format",
+    "format:client": "pnpm --filter='./packages/client/' run format",
+    
+    "lint:server": "pnpm --filter='./packages/server/' run lint",
+    "lint:client": "pnpm --filter='./packages/client/' run lint"
+  }
+}

@@ -1,0 +1,4 @@
+node_modules
+.env
+enter_in_db.sh
+start_docker

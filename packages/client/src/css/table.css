@@ -1,0 +1,21 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-wrap: nowrap;
+}
+
+th {
+  padding: 1rem;
+}
+
+td {
+  padding: 1rem;
+}
+
+td > p {
+  padding: 1rem;
+}
