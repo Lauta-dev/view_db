@@ -59,18 +59,12 @@ export default function App() {
 
   }, [sqlQuery])
 
-  function choiseTable(table: string) {
-    setSelectRow(table)
-  }
-
-  function handleQuery(query: string) {
-    setSqlQuery(query)
-  }
+  console.log({data, errorInFetch})
 
   return (
     <>
       <div className="container">
-        <GetTable children={choiseTable} />
+        <GetTable children={setSelectRow} />
 
         <div className="t-container">
           {errorInFetch || data == undefined ? (
@@ -81,7 +75,7 @@ export default function App() {
                 registerTotal='1000'
                 registersView='50'
                 tableName={selectRow ?? ""}
-                query={handleQuery}
+                query={setSqlQuery}
               />
               <TableOfSQL TableColumns={data} />
             </>

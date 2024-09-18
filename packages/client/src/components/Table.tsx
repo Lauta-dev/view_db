@@ -9,31 +9,34 @@ import {
 
 import { ReturnData } from "@interface/server.interface"
 export default function TableOfSQL({ TableColumns }: { TableColumns: ReturnData }) {
-  const { tableInfo, tableWithId } = TableColumns
+  const { tableWithId, registersKeys} = TableColumns
 
-  return <Table>
+  console.log({TableColumns})
+  return <>
+    {JSON.stringify(TableColumns, null, 4)}
+    <Table>
     <TableHeader>
       <TableRow>
-        {tableInfo.map((data) => (
-          <TableHead key={data.UUID}>
-            {' '}
-            {data.columnName} ({data.dataType ?? "not exist"})
+        {registersKeys.map((data) => (
+          <TableHead key={data}>
+            {data}
           </TableHead>
         ))}
       </TableRow>
     </TableHeader>
     <TableBody>
       <TableRow className="tt">
-        {tableInfo.map((e) => (
+        {registersKeys.map((e) => (
           <>
             <TableCell key={crypto.randomUUID()}>
               {tableWithId.map((data) => {
-                if (e.dataType === 'bytea') {
-                  data.values[e.columnName] = 'bit'
-                }
+                  let newData = data.values[e]
 
-                const o = data.values[e.columnName]
-                return <p key={crypto.randomUUID()}>{o}</p>
+                  if (data.values[e].type === "Buffer") {
+                    newData = data.values[e] = "*"
+                  }
+
+                return <p key={crypto.randomUUID()}>{newData}</p>
               })}
             </TableCell>
           </>
@@ -41,4 +44,5 @@ export default function TableOfSQL({ TableColumns }: { TableColumns: ReturnData 
       </TableRow>
     </TableBody>
   </Table>
+  </>
 }
